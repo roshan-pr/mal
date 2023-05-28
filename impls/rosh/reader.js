@@ -54,10 +54,10 @@ const read_vector = (reader) => {
 const read_atom = (reader) => {
   const token = reader.next();
   if (token.match(/^-?[0-9]+$/)) {
-    return new MalValue(parseInt(token));
+    return parseInt(token);
   }
-  if (token === "true") return new MalBool(token);
-  if (token === "false") return new MalBool(token);
+  if (token === "true") return new MalBool(true);
+  if (token === "false") return new MalBool(false);
   if (token === "nil") return new MalNill();
 
   return new MalSymbol(token);

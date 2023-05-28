@@ -1,23 +1,28 @@
 const readline = require("readline");
 const { pr_str } = require("./printer");
 const { read_str } = require("./reader");
-const { MalSymbol, MalList, MalValue, MalBool } = require("./types");
+const { MalSymbol, MalList, MalValue, MalBool, MalVector } = require("./types");
 
 const readLine = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
 });
 
+const arithmeticOperation = (cb, initialValue, ...args) => {
+  if (initialValue === undefined) throw "Wrong arguments";
+
+  return args.reduce(cb, initialValue);
+};
+
 const env = {
-  "+": (...args) =>
-    new MalValue(args.reduce((a, b) => new MalValue(a.value + b.value)).value),
-  "-": (...args) =>
-    new MalValue(args.reduce((a, b) => new MalValue(a.value - b.value)).value),
-  "*": (...args) =>
-    new MalValue(args.reduce((a, b) => new MalValue(a.value * b.value)).value),
-  "/": (...args) =>
-    new MalValue(args.reduce((a, b) => new MalValue(a.value / b.value)).value),
-  "=": (a, b) => new MalBool(a.value === b.value),
+  "+": (...args) => arithmeticOperation((a, b) => a + b, ...args),
+  "*": (...args) => arithmeticOperation((a, b) => a * b, ...args),
+  "/": (...args) => arithmeticOperation((a, b) => a / b, ...args),
+  "-": (initialValue, ...args) => {
+    if (args.length === 0) return -initialValue;
+    return arithmeticOperation((a, b) => a - b, initialValue, ...args);
+  },
+  // "=": (a, b) => new MalBool(a === b),
 };
 
 const eval_ast = (ast, env) => {
@@ -30,14 +35,17 @@ const eval_ast = (ast, env) => {
     return new MalList(newAst);
   }
 
+  if (ast instanceof MalVector) {
+    const newAst = ast.value.map((x) => EVAL(x, env));
+    return new MalVector(newAst);
+  }
+
   return ast;
 };
 
 const READ = (str) => read_str(str);
 const EVAL = (ast, env) => {
-  if (!(ast instanceof MalList)) {
-    return eval_ast(ast, env);
-  }
+  if (!(ast instanceof MalList)) return eval_ast(ast, env);
   if (ast.isEmpty()) return ast;
 
   const [fn, ...args] = eval_ast(ast, env).value;
