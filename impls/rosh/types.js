@@ -40,6 +40,21 @@ class MalVector extends MalValue {
   }
 }
 
+class MalHashMap extends MalValue {
+  constructor(value) {
+    super(value);
+  }
+  pr_str() {
+    return (
+      "{" +
+      this.value
+        .map((x) => (x instanceof MalValue ? x.pr_str() : x))
+        .join(" ") +
+      "}"
+    );
+  }
+}
+
 class MalBool extends MalValue {
   constructor(value) {
     super(value);
@@ -60,6 +75,7 @@ module.exports = {
   MalValue,
   MalList,
   MalVector,
+  MalHashMap,
   MalNill,
   MalBool,
 };

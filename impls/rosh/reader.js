@@ -1,8 +1,8 @@
 const {
-  MalValue,
   MalList,
   MalSymbol,
   MalVector,
+  MalHashMap,
   MalNill,
   MalBool,
 } = require("./types");
@@ -51,6 +51,14 @@ const read_vector = (reader) => {
   return new MalVector(ast);
 };
 
+const read_hash_map = (reader) => {
+  const ast = read_seq(reader, "}");
+  if (ast.length % 2 !== 0) {
+    throw "unbalanced";
+  }
+  return new MalHashMap(ast);
+};
+
 const read_atom = (reader) => {
   const token = reader.next();
   if (token.match(/^-?[0-9]+$/)) {
@@ -59,6 +67,9 @@ const read_atom = (reader) => {
   if (token === "true") return new MalBool(true);
   if (token === "false") return new MalBool(false);
   if (token === "nil") return new MalNill();
+
+  if (token.match(/^:/)) return token;
+  if (token.match(/^"/)) return token;
 
   return new MalSymbol(token);
 };
@@ -70,6 +81,8 @@ const read_form = (reader) => {
       return read_list(reader);
     case "[":
       return read_vector(reader);
+    case "{":
+      return read_hash_map(reader);
     default:
       return read_atom(reader);
   }
