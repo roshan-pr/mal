@@ -8,6 +8,7 @@ const {
   MalBool,
   MalVector,
   MalHashMap,
+  MalNill,
 } = require("./types");
 const { Env } = require("./env");
 
@@ -65,6 +66,13 @@ const EVAL = (ast, env) => {
     case "def!":
       env.set(ast.value[1], EVAL(ast.value[2], env));
       return env.get(ast.value[1]);
+    case "let*":
+      const newEnv = new Env(env);
+
+      const variable = ast.value[1].value[0];
+      const value = ast.value[1].value[1];
+      newEnv.set(variable, EVAL(value, newEnv));
+      return EVAL(ast.value[2], newEnv);
   }
   const [fn, ...args] = eval_ast(ast, env).value;
 
