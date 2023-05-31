@@ -18,7 +18,15 @@ class MalList extends MalValue {
     super(value);
   }
   pr_str() {
-    return "(" + this.value.map((x) => x.pr_str()).join(" ") + ")";
+    return (
+      "(" +
+      this.value
+        .map((value) =>
+          value instanceof MalValue === true ? value.pr_str() : value
+        )
+        .join(" ") +
+      ")"
+    );
   }
   isEmpty() {
     return this.value.length === 0;

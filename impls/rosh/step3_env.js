@@ -66,13 +66,14 @@ const EVAL = (ast, env) => {
     case "def!":
       env.set(ast.value[1], EVAL(ast.value[2], env));
       return env.get(ast.value[1]);
+
     case "let*":
       const newEnv = new Env(env);
 
-      const variables = ast.value[1].value;
-      for (let index = 0; index < variables.length; index += 2) {
-        const variable = variables[index];
-        const value = variables[index + 1];
+      const let_bindings = ast.value[1].value;
+      for (let index = 0; index < let_bindings.length; index += 2) {
+        const variable = let_bindings[index];
+        const value = let_bindings[index + 1];
         newEnv.set(variable, EVAL(value, newEnv));
       }
 
