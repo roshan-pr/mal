@@ -69,9 +69,13 @@ const EVAL = (ast, env) => {
     case "let*":
       const newEnv = new Env(env);
 
-      const variable = ast.value[1].value[0];
-      const value = ast.value[1].value[1];
-      newEnv.set(variable, EVAL(value, newEnv));
+      const variables = ast.value[1].value;
+      for (let index = 0; index < variables.length; index += 2) {
+        const variable = variables[index];
+        const value = variables[index + 1];
+        newEnv.set(variable, EVAL(value, newEnv));
+      }
+
       return EVAL(ast.value[2], newEnv);
   }
   const [fn, ...args] = eval_ast(ast, env).value;
