@@ -25,9 +25,26 @@ env.set(new MalSymbol("-"), (...args) =>
   arithmeticOperation((a, b) => a - b, ...args)
 );
 
-env.set(new MalSymbol(">="), (a, b) => new MalBool(a >= b));
-env.set(new MalSymbol(">="), (a, b) => new MalBool(a >= b));
-env.set(new MalSymbol("="), (a, b) => new MalBool(a === b));
+env.set(
+  new MalSymbol(">="),
+  (...args) => new MalBool(arithmeticOperation((a, b) => a >= b, ...args))
+);
+
+env.set(
+  new MalSymbol("<="),
+  (...args) => new MalBool(arithmeticOperation((a, b) => a <= b, ...args))
+);
+
+env.set(
+  new MalSymbol("="),
+  (...args) => new MalBool(arithmeticOperation((a, b) => a === b, ...args))
+);
+
+env.set(
+  new MalSymbol(">"),
+  (...args) => new MalBool(arithmeticOperation((a, b) => a > b, ...args))
+);
+
 env.set(new MalSymbol(">"), (a, b) => new MalBool(a > b));
 env.set(new MalSymbol("<"), (a, b) => new MalBool(a < b));
 env.set(new MalSymbol("str"), (...args) => args.join(""));
@@ -45,6 +62,7 @@ env.set(new MalSymbol("prn"), (...args) => {
   return new MalNill();
 });
 
+//// not done!!!
 env.set(new MalSymbol("println"), (...args) => {
   process.stdout.setEncoding("utf-8");
   process.stdout.write(args.join(" ").toString() + "\n");

@@ -67,15 +67,17 @@ const eval_do_form = (ast, env) => {
 };
 
 const eval_fn_form = (ast, env) => {
-  const [bindings, expression] = ast.value.slice(1);
+  const [bindings, ...expressions] = ast.value.slice(1);
 
   return (...args) => {
     const fnEnv = new Env(env);
     for (let index = 0; index < bindings.value.length; index++) {
       fnEnv.set(bindings.value[index], EVAL(args[index], fnEnv));
     }
-
-    return EVAL(expression, fnEnv);
+    // console.log("===", expressions);
+    expressions.slice(0, -1).forEach((expression) => EVAL(expression, fnEnv));
+    return EVAL(...expressions.slice(-1), fnEnv);
+    // return EVAL(expressions, fnEnv);
   };
 };
 
