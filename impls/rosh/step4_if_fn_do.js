@@ -3,7 +3,7 @@ const { pr_str } = require("./printer");
 const { read_str } = require("./reader");
 const { MalSymbol, MalList, MalVector, MalHashMap } = require("./types");
 const { Env } = require("./env");
-const { env } = require("./initEnv");
+const { ns } = require("./core");
 const { MalNill } = require("./types");
 
 const readLine = readline.createInterface({
@@ -109,7 +109,17 @@ const EVAL = (ast, env) => {
 
 const PRINT = (malValue) => pr_str(malValue);
 
-const repeat = (str) => PRINT(EVAL(READ(str), env));
+const initEnv = (ns) => {
+  const env = new Env();
+  for (const symbol in ns) {
+    // console.log(symbol);
+    // console.log(ns[symbol]);
+    env.set(new MalSymbol(symbol), ns[symbol]);
+  }
+  return env;
+};
+
+const repeat = (str) => PRINT(EVAL(READ(str), initEnv(ns)));
 
 const repl = () => {
   readLine.question("user> ", (line) => {
