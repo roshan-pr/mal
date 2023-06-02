@@ -69,6 +69,16 @@ class MalBool extends MalValue {
   }
 }
 
+class MalString extends MalValue {
+  constructor(value) {
+    super(value);
+  }
+
+  pr_str() {
+    return '"' + this.value + '"';
+  }
+}
+
 class MalNill extends MalValue {
   constructor() {
     super(null);
@@ -86,4 +96,5 @@ module.exports = {
   MalHashMap,
   MalNill,
   MalBool,
+  MalString,
 };

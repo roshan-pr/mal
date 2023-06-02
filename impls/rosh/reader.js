@@ -5,6 +5,7 @@ const {
   MalHashMap,
   MalNill,
   MalBool,
+  MalString,
 } = require("./types");
 
 class Reader {
@@ -31,10 +32,10 @@ const tokenize = (str) => {
 const read_seq = (reader, closingSymbol) => {
   reader.next();
   const ast = []; // abstract syntax tree
+
   while (reader.peek() != closingSymbol) {
-    if (reader.peek() === undefined) {
-      throw "unbalanced";
-    }
+    if (reader.peek() === undefined) throw "unbalanced";
+
     ast.push(read_form(reader));
   }
   reader.next();
@@ -53,17 +54,20 @@ const read_vector = (reader) => {
 
 const read_hash_map = (reader) => {
   const ast = read_seq(reader, "}");
-  if (ast.length % 2 !== 0) {
-    throw "unbalanced";
-  }
+
+  if (ast.length % 2 !== 0) throw "unbalanced";
+
   return new MalHashMap(ast);
 };
 
+const parseString = (str) => str.slice(1, -1);
+
 const read_atom = (reader) => {
   const token = reader.next();
-  if (token.match(/^-?[0-9]+$/)) {
-    return parseInt(token);
-  }
+
+  if (token.match(/^"/)) return new MalString(parseString(token));
+  if (token.match(/^-?[0-9]+$/)) return parseInt(token);
+
   if (token === "true") return new MalBool(true);
   if (token === "false") return new MalBool(false);
   if (token === "nil") return new MalNill();

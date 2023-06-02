@@ -74,10 +74,10 @@ const eval_fn_form = (ast, env) => {
     for (let index = 0; index < bindings.value.length; index++) {
       fnEnv.set(bindings.value[index], EVAL(args[index], fnEnv));
     }
-    // console.log("===", expressions);
+    // return eval_do_form(new MalList(ast.value), fnEnv);
+
     expressions.slice(0, -1).forEach((expression) => EVAL(expression, fnEnv));
     return EVAL(...expressions.slice(-1), fnEnv);
-    // return EVAL(expressions, fnEnv);
   };
 };
 
