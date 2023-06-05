@@ -7,9 +7,9 @@ const {
   MalVector,
   MalHashMap,
   MalFunction,
+  MalNill,
 } = require("./types");
 const { Env } = require("./env");
-const { MalNill } = require("./types");
 const { ns } = require("./core");
 
 const readLine = readline.createInterface({
