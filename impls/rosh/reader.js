@@ -29,6 +29,14 @@ const tokenize = (str) => {
   return [...str.matchAll(regex)].map((x) => x[1]).slice(0, -1);
 };
 
+const createString = (token) => {
+  let str = token.slice(1, -1).replace(/\\(.)/g, (_, c) => {
+    return c === "n" ? "\n" : c;
+  });
+
+  return new MalString(str);
+};
+
 const read_seq = (reader, closingSymbol) => {
   reader.next();
   const ast = []; // abstract syntax tree
@@ -65,7 +73,7 @@ const parseString = (str) => str.slice(1, -1);
 const read_atom = (reader) => {
   const token = reader.next();
 
-  if (token.match(/^"/)) return new MalString(parseString(token));
+  if (token.match(/^"/)) return createString(token);
   if (token.match(/^-?[0-9]+$/)) return parseInt(token);
 
   if (token === "true") return new MalBool(true);
@@ -73,7 +81,6 @@ const read_atom = (reader) => {
   if (token === "nil") return new MalNill();
 
   if (token.match(/^:/)) return token;
-  if (token.match(/^"/)) return token;
 
   return new MalSymbol(token);
 };
@@ -87,6 +94,9 @@ const read_form = (reader) => {
       return read_vector(reader);
     case "{":
       return read_hash_map(reader);
+    case ";":
+      reader.next();
+      return new MalNill();
     default:
       return read_atom(reader);
   }

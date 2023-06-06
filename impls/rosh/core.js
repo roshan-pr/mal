@@ -1,5 +1,6 @@
 const { isDeepStrictEqual } = require("util");
 const { Env } = require("./env");
+const fs = require("fs");
 const {
   MalSymbol,
   MalList,
@@ -8,7 +9,9 @@ const {
   MalNill,
   MalValue,
   MalString,
+  MalAtom,
 } = require("./types");
+const { read_str } = require("./reader");
 
 const arithmeticOperation = (cb, initialValue, ...args) => {
   if (initialValue === undefined) throw "Wrong arguments";
@@ -50,12 +53,13 @@ const ns = {
   "empty?": (arg) => new MalBool(arg.value.length === 0),
   str: (...args) => {
     const stringValues = args.map((a) => (a instanceof MalValue ? a.value : a));
-    return '"' + stringValues.join("") + '"';
+    // return '"' + stringValues.join("") + '"';
+    return new MalString(stringValues.join(""));
   },
   "list?": (arg) => arg instanceof MalList,
   prn: (...args) => {
     const consolidatedString = args.map((a) =>
-      a instanceof MalValue ? a.pr_str() : a
+      a instanceof MalValue ? a.pr_str(true) : a
     );
     console.log(...consolidatedString);
     return new MalNill();
@@ -67,6 +71,13 @@ const ns = {
     console.log(...consolidatedString);
     return new MalNill();
   },
+  "read-string": (string) => read_str(string.value),
+  slurp: (filename) => new MalString(fs.readFileSync(filename.value, "utf-8")),
+  atom: (value) => new MalAtom(value),
+  "atom?": (value) => value instanceof MalAtom,
+  deref: (atom) => atom.deref(),
+  "reset!": (atom, value) => atom.reset(value),
+  "swap!": (atom, fn, ...values) => atom.swap(fn, values),
 };
 
 module.exports = { ns };
