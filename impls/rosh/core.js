@@ -23,11 +23,14 @@ const isIterable = (a) => {
   return a instanceof MalList || a instanceof MalVector;
 };
 
-const deepStrictEqual = (a, b) => {
+const _deepStrictEqual = (a, b) => {
   if (isIterable(a) && isIterable(b) && a.value.length === b.value.length) {
     return a.value.every((a, i) => a === b.value[i]);
   }
   if (a instanceof MalValue && b instanceof MalValue)
+    return a.value === b.value;
+
+  if (a instanceof MalQuote && b instanceof MalQuote)
     return a.value === b.value;
 
   return a === b;
@@ -43,13 +46,16 @@ const ns = {
   "<=": (...args) =>
     new MalBool(arithmeticOperation((a, b) => a <= b, ...args)),
   "=": (...args) =>
-    new MalBool(arithmeticOperation((a, b) => deepStrictEqual(a, b), ...args)),
+    new MalBool(
+      arithmeticOperation((a, b) => isDeepStrictEqual(a, b), ...args)
+    ),
   ">": (...args) => new MalBool(arithmeticOperation((a, b) => a > b, ...args)),
   "<": (...args) => new MalBool(arithmeticOperation((a, b) => a < b, ...args)),
   not: (arg) => (arg instanceof MalValue ? !arg.value : !arg),
   count: (arg) => arg.value.length,
   list: (...args) => new MalList(args),
-  vector: (...args) => new MalVector(args),
+  vec: (args) => new MalVector([...args.value]),
+  vector: (args) => new MalVector([args]),
   "empty?": (arg) => new MalBool(arg.value.length === 0),
   str: (...args) => {
     const stringValues = args.map((a) => (a instanceof MalValue ? a.value : a));
@@ -78,6 +84,8 @@ const ns = {
   deref: (atom) => atom.deref(),
   "reset!": (atom, value) => atom.reset(value),
   "swap!": (atom, fn, ...values) => atom.swap(fn, values),
+  cons: (value, list) => new MalList([value, ...list.value]),
+  concat: (...lists) => new MalList(lists.flatMap((x) => x.value)),
 };
 
 module.exports = { ns };

@@ -1,3 +1,6 @@
+// const pr_str = (value) =>
+//   value instanceof MalValue ? value.pr_str(true) : value;
+
 class MalValue {
   constructor(value) {
     this.value = value;
@@ -30,6 +33,9 @@ class MalList extends MalValue {
   }
   isEmpty() {
     return this.value.length === 0;
+  }
+  beginsWith(symbol) {
+    return !this.isEmpty() && this.value[0].value === symbol;
   }
 }
 
